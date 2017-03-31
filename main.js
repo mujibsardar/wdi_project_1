@@ -4,6 +4,27 @@ var horizontalLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 var verticalCounter = 8;
 var horizontalCounter = 0;
 var boardDimensionValue = 8;
+var player1Turn = true;
+var blackPieceLocations = [];
+var whitePieceLocations = [];
+
+// function Coordinates(xValue, yValue){
+//   this.xValue = xValue;
+//   this.yValue = yValue;
+// }
+
+function Piece(_name, _color, _player){
+  this.name = _name;
+  this.color = _color;
+  this.player = _player;
+}
+
+function Player(_name, _color, _player1){
+  this.name = _name;
+  this.color = _color;
+  this.player1 = _player1;
+}
+
 
 // Chess Pieces
 // var piece = {name: "PAWN", color: "black"};
@@ -87,18 +108,59 @@ function showPosition(){
 
 function setupPieces(){
   for(i=0; i < 8; i++){
+
     boardCells2D[i][2].piece = createPiece("pawn", "black");
     boardCells2D[i][2].divRef.innerHTML = '<img src="pawn_black.png" alt="black pawn">';
+    blackPieceLocations.push(createLocation(i,2));
 
     boardCells2D[i][7].piece = createPiece("pawn", "white");
     boardCells2D[i][7].divRef.innerHTML = '<img src="pawn_white.png" alt="white pawn">';
+    whitePieceLocations.push(createLocation(i,7));
   }
+}
 
+function createLocation(_x, _y){
+  return {x: _x, y: _y};
 }
 
 function createPiece(nameArg, colorArg){
   return {name: nameArg, color: colorArg}
 }
 
+function startGame(){
+    makePiecesClickable(player1Turn);
+
+}
+
+function makePiecesClickable(_player1Turn){
+  if(_player1Turn){
+    blackPieceLocations.forEach(function(_location){
+      boardCells2D[_location.x][_location.y].divRef.addEventListener("click", function(){
+        //What happens when a pice is selected
+        console.log("Black Piece Selected");
+        makeCellsClickable(_player1Turn,_location);
+        })
+    })
+  }
+  else {
+    whitePieceLocations.forEach(function(_location){
+      boardCells2D[_location.x][_location.y].divRef.addEventListener("click", function(){
+        console.log("White Piece Selected");
+        makeCellsClickable(_player1Turn,_location);
+      })
+    })
+  }
+}
+
+function makeCellsClickable(_player1Turn, _location){
+  if(_player1Turn){
+
+  }
+  else {
+
+  }
+}
+
 setupBoard();
 setupPieces();
+startGame();
