@@ -7,6 +7,7 @@ var horizontalCounter = 0;
 var player1Turn = true;
 var player_1 = new Player("Avan");
 var player_2 = new Player("Android");
+var capturedPieces = {player_1: [], player_2: []};
 var boardCells2D = [['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','','']];
 var showingDestinationCells = false;
 
@@ -127,6 +128,7 @@ function setupPieces(){
 
 
 // ************************* 4th ******************************** //
+// Handles Pieces ONLY
 function makePiecesClickable(){
   var xValue;
   var yValue;
@@ -138,19 +140,20 @@ function makePiecesClickable(){
           if(boardCells2D[i][j].piece.color === "white"){
             boardCells2D[i][j].divRef.on("click", function(){
               console.log("White Clicked");
+              console.log("highlightTrueFalse: "  + showingDestinationCells);
               xValue = $(this).attr("data-xValue");
               yValue = $(this).attr("data-yValue");
                   // Is it the first time user is clicking a piece?
                   // Yes
                  if(!showingDestinationCells){
-                   showingDestinationCells = !showingDestinationCells;
+                   showingDestinationCells = true;
                    makeDestinationCellsClickable(new Location(xValue,yValue));
                  }
                   // No
                  else {
-                   // User clicked on piece while destination cell were highlighted
-                   showingDestinationCells = !showingDestinationCells;
-                   // Remove click event listener on destination cells
+                   // User clicked on piece while destination cells were highlighted
+                   showingDestinationCells = false;
+                   // Remove click event listener on old destination cells
                    unMakeDestinationCellsClickable();
                    // Remove the css highlights for those cells
                    removeCellHighlights(); // this works
@@ -172,19 +175,13 @@ function makePiecesClickable(){
           if(boardCells2D[i][j].piece.color === "black"){
             boardCells2D[i][j].divRef.on("click", function(){
               console.log("Black Clicked");
-              showingDestinationCells = !showingDestinationCells;
               xValue = $(this).attr("data-xValue");
               yValue = $(this).attr("data-yValue");
-              // console.log("y: " + $(this).toSource());//.divRef.attr());
               if(!showingDestinationCells){
-                // console.log("Black NOT Highlighted");
-                showingDestinationCells = !showingDestinationCells;
-                // console.log("changed to " + showingDestinationCells);
+                showingDestinationCells = true;
                 makeDestinationCellsClickable(new Location(xValue,yValue));
                } else {
-                //  console.log("Black Highlighted");
-                 showingDestinationCells = !showingDestinationCells;
-                //  console.log("changed to " + showingDestinationCells);
+                 showingDestinationCells = false;
                  unMakeDestinationCellsClickable();
                  removeCellHighlights();
                  makePiecesClickable();
@@ -220,7 +217,6 @@ function returnMovingCaptureRules(_pieceName){
 function placePieceInCell(_location, _piece, _imageText){
   var x = _location.x;
   var y = _location.y;
-
   boardCells2D[x][y].piece = _piece;
   boardCells2D[x][y].divRef.append(_imageText);
 }
@@ -235,16 +231,16 @@ function makeDestinationCellsClickable(_location){
 
   var arrayOfAllPossibleCells = returnAllPossibleDestinationCell(selectedPiece, location);
   arrayOfAllPossibleCells.forEach(function(element) {
+      // What happens when user clicks on one of the destination cells
       boardCells2D[element.x][element.y].divRef.on("click", function(){
       console.log("Destination Cell says Hey, you clicked me...Stop it.");
       xValue = $(this).attr("data-xValue");
       yValue = $(this).attr("data-yValue");
-      removeOldClickableCells();
-      removeCellHighlights();
       movePieceToNewLocation(location, new Location(xValue, yValue));
-      checkForWinnerOrCheck();
-      removeOldClickableCells();
+      removeCellHighlights();
+      switchPlayersOrEndGame();
     })
+    // Highlight all destination cells
     highlightNewCells(new Location(element.x, element.y));
   })
 }
@@ -270,27 +266,74 @@ function highlightNewCells(_location){
 
 // ************************* Helper Function ******************************** //
 function checkForWinnerOrCheck(){
-  switchTurns();
+  console.log("checking for winners or check...");
 }
 
 
 // ************************* Helper Function ******************************** //
-function switchTurns(){
+function switchPlayersOrEndGame(){
+  checkForWinnerOrCheck();
   player1Turn = !player1Turn;
+  removeAllClickEventListeners();
   makePiecesClickable();
 }
 
 
 // ************************* Helper Function ******************************** //
 function movePieceToNewLocation(_originLocation, _destinationLocation){
-  var color = (player1Turn ? "white" : "black")
+  showingDestinationCells = false;
+  var color = (player1Turn ? "white" : "black");
+  var colorOpponent = (!player1Turn ? "white" : "black");
   console.log("movePiceToNewLocation " + color);
   var imgElementText = '<img src="pawn_' + color + '.png" alt="' + color + ' pawn">';
   var piece = boardCells2D[_originLocation.x][_originLocation.y].piece;
   var location = _destinationLocation;
-  boardCells2D[_originLocation.x][_originLocation.y].divRef.children("img:first").remove();
+
+  removePieceAt(_originLocation);
+
+  if(opponentOccupied(location, colorOpponent)){
+    capture(location);
+  }
+
   placePieceInCell(location, piece, imgElementText);
   makePiecesClickable();
+}
+
+
+// ************************* Helper Function ******************************** //
+function opponentOccupied(_location, _opponentColor){
+  if(boardCells2D[_location.x][_location.y].piece != null){
+    if(boardCells2D[_location.x][_location.y].piece.color === _opponentColor){
+      return true;
+    }
+    return false;
+  }
+  return false;
+}
+
+
+// ************************* Helper Function ******************************** //
+function capture(_location){
+  capturePieceAt(_location);
+  removePieceAt(_location);
+}
+
+
+// ************************* Helper Function ******************************** //
+function capturePieceAt(_location){
+  if(player1Turn){
+    capturedPieces.player_1.push(boardCells2D[_location.x][_location.y].piece);
+  }
+  else {
+    capturedPieces.player_2.push(boardCells2D[_location.x][_location.y].piece);
+  }
+}
+
+
+// ************************* Helper Function ******************************** //
+function removePieceAt(_location){
+  boardCells2D[_location.x][_location.y].piece = null;
+  boardCells2D[_location.x][_location.y].divRef.children("img:first").remove();
 }
 
 
@@ -310,7 +353,12 @@ function returnAllPossibleDestinationCell(_piece, _location){
   if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY;
-    returnArray.push(new Location(destinationX, destinationY));
+    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+
+    if (condition1 ){
+      returnArray.push(new Location(destinationX, destinationY));
+    }
+
   }
   // vertical
   validMove = moveRule.vertical;
@@ -322,7 +370,9 @@ function returnAllPossibleDestinationCell(_piece, _location){
       destinationX = originX;
       destinationY = originY + validMove.numberOfMovesPositive;
     }
-    returnArray.push(new Location(destinationX, destinationY));
+    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+      returnArray.push(new Location(destinationX, destinationY));
+    }
   }
 
   // diagonal
@@ -332,17 +382,25 @@ function returnAllPossibleDestinationCell(_piece, _location){
     if(playingDown){
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
-    returnArray.push(new Location(destinationX, destinationY));
+    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+      returnArray.push(new Location(destinationX, destinationY));
+    }
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
-    returnArray.push(new Location(destinationX, destinationY));
+    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+      returnArray.push(new Location(destinationX, destinationY));
+    }
   } else {
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY + validMove.numberOfMovesPositive;
-    returnArray.push(new Location(destinationX, destinationY));
+    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+      returnArray.push(new Location(destinationX, destinationY));
+    }
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY + validMove.numberOfMovesPositive;
-    returnArray.push(new Location(destinationX, destinationY));
+    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+      returnArray.push(new Location(destinationX, destinationY));
+    }
   }
 
   }
@@ -357,7 +415,9 @@ function returnAllPossibleDestinationCell(_piece, _location){
       destinationX = originX + validMove.numberOfMovesPositive;
       destinationY = originY + validMove.numberOfMovesPositive;
   }
+  if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
     returnArray.push(new Location(destinationX, destinationY));
+  }
   }
   return returnArray;
 
@@ -366,7 +426,19 @@ function returnAllPossibleDestinationCell(_piece, _location){
 
 
 // ************************* Helper Function ******************************** //
-function removeOldClickableCells(){
+function ownPlayeroccupied(_location){
+  var color =  (player1Turn ? "white" : "black");
+  if(boardCells2D[_location.x][_location.y].piece != null) {
+    if(boardCells2D[_location.x][_location.y].piece.color === color){
+      return true;
+    }
+    return false;
+  }
+  return false;
+}
+
+// ************************* Helper Function ******************************** //
+function removeAllClickEventListeners(){
   $(".cell").unbind();
   // for(var i = 0; i < boardCells2D.length; i++){
   //   for(var j=0; j <boardCells2D[i].length; j++){
