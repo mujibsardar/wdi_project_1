@@ -13,11 +13,12 @@ var showingDestinationCells = false;
 
 
 // ************************* Objects ******************************** //
-function Piece(_name, _color, _player, _moveRule){
+function Piece(_name, _color, _player, _moveRule, _imgText){
   this.name = _name;
   this.color = _color;
   this.player = _player;
   this.moveRule = _moveRule;
+  this.imgText = _imgText;
 }
 
 function Player(_name){
@@ -115,15 +116,28 @@ function setupBoard(){
 // ************************* 3rd ******************************** //
 function setupPieces(){
   for(i=0; i < 8; i++){
+    /////////// PAWN
     var location = new Location(i,1);
-    var piece = new Piece("pawn", "black", player_2, returnMovingCaptureRules("pawn"));
     var imageText = '<img src="pawn_black.png" alt="black pawn">';
-    placePieceInCell(location, piece, imageText);
+    var piece = new Piece("pawn", "black", player_2, returnMovingCaptureRules("pawn"), imageText);
+    placePieceInCell(location, piece);
 
     location = new Location(i,6);
-    piece = new Piece("pawn", "white", player_1, returnMovingCaptureRules("pawn"));
     imageText = '<img src="pawn_white.png" alt="white pawn">';
-    placePieceInCell(location, piece, imageText)
+    piece = new Piece("pawn", "white", player_1, returnMovingCaptureRules("pawn"), imageText);
+    placePieceInCell(location, piece);
+
+
+///////////////// QUEEN
+    var location = new Location(i,0);
+    var imageText = '<img src="queen_black.png" alt="black queen">';
+    var piece = new Piece("queen", "black", player_2, returnMovingCaptureRules("queen"), imageText);
+    placePieceInCell(location, piece);
+
+    location = new Location(i,7);
+    imageText = '<img src="queen_white.png" alt="white queen">';
+    var piece = new Piece("queen", "white", player_2, returnMovingCaptureRules("queen"), imageText);
+    placePieceInCell(location, piece);
   }
 }
 
@@ -207,6 +221,13 @@ function returnMovingCaptureRules(_pieceName){
     var pawnHop = new ValidMove(false, false, 0, 0);
     return new MoveRule(pawnHorizontal, pawnVertical, pawnDiagonal, pawnHop);
     break;
+    case "queen":
+    var horizontal = new ValidMove(true, true, 7, 7);
+    var vertical = new ValidMove(true, true, 7, 7);
+    var diagonal = new ValidMove(true, true, 7, 7);
+    var hop = new ValidMove(false, false, 0, 0);
+    return new MoveRule(horizontal, vertical, diagonal, hop);
+    break;
     default:
     alert("Exception, not a valid piece. Return null.");
     return null;
@@ -215,11 +236,11 @@ function returnMovingCaptureRules(_pieceName){
 
 
 // ************************* Helper Function ******************************** //
-function placePieceInCell(_location, _piece, _imageText){
+function placePieceInCell(_location, _piece){
   var x = _location.x;
   var y = _location.y;
   boardCells2D[x][y].piece = _piece;
-  boardCells2D[x][y].divRef.append(_imageText);
+  boardCells2D[x][y].divRef.append(_piece.imgText);
 }
 
 
@@ -286,7 +307,7 @@ function movePieceToNewLocation(_originLocation, _destinationLocation){
   var color = (player1Turn ? "white" : "black");
   var colorOpponent = (!player1Turn ? "white" : "black");
   console.log("movePiceToNewLocation " + color);
-  var imgElementText = '<img src="pawn_' + color + '.png" alt="' + color + ' pawn">';
+  // var imgElementText = '<img src="pawn_' + color + '.png" alt="' + color + ' pawn">';
   var piece = boardCells2D[_originLocation.x][_originLocation.y].piece;
   var location = _destinationLocation;
 
@@ -296,7 +317,7 @@ function movePieceToNewLocation(_originLocation, _destinationLocation){
     capture(location);
   }
 
-  placePieceInCell(location, piece, imgElementText);
+  placePieceInCell(location, piece);
   makePiecesClickable();
 }
 
@@ -327,8 +348,10 @@ function capture(_location){
 function capturePieceAt(_location){
   if(player1Turn){
     capturedPieces.player_1.push(boardCells2D[_location.x][_location.y].piece);
+    $(".player_1_capture").append('<img src="pawn_black.png" alt="black pawn">');
   }
   else {
+    $(".player_2_capture").append('<img src="pawn_white.png" alt="white pawn">');
     capturedPieces.player_2.push(boardCells2D[_location.x][_location.y].piece);
   }
 }
@@ -360,34 +383,44 @@ function returnAllPossibleDestinationCell(_piece, _location){
 
   // horizontal
   validMove = moveRule.horizontal;
-  if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
+  if (validMove.canMove || validMove.canCapture){
+
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY;
-    console.log("horizontal");
     if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
+
+
   }
   // vertical
   validMove = moveRule.vertical;
-  if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
-    if(playingDown){
-      destinationX = originX;
-      destinationY = originY - validMove.numberOfMovesPositive;
-    } else {
-      destinationX = originX;
-      destinationY = originY + validMove.numberOfMovesPositive;
+  if (validMove.canMove || validMove.canCapture){
+
+    for(var i = 1; i < validMove.numberOfMovesPositive+1; i++){
+
+      if(playingDown){
+        destinationX = originX;
+        destinationY = originY - i;
+      } else {
+        destinationX = originX;
+        destinationY = originY + i;
+      }
+      if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
+        returnArray.push(new Location(destinationX, destinationY));
+      }
+      else {
+        break;
+      }
     }
-    console.log("vertical");
-    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
-      returnArray.push(new Location(destinationX, destinationY));
-    }
+
+
+
   }
 
   // diagonal
   validMove = moveRule.diagonal;
-  if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
-
+  if (validMove.canMove || validMove.canCapture){
     if(playingDown){
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
@@ -422,7 +455,7 @@ function returnAllPossibleDestinationCell(_piece, _location){
   }
   // hop NEEDS FIXING
   validMove = moveRule.hop;
-  if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
+  if (validMove.canMove || validMove.canCapture){
     if(playingDown){
       destinationX = originX - validMove.numberOfMovesPositive;
       destinationY = originY - validMove.numberOfMovesPositive;
