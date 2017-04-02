@@ -38,8 +38,8 @@ function Location(_x, _y){
 }
 
 // Object to represent a possible move and or capture for a piece
-function ValidMove(_isValidCapture, _numberOfMovesPositive, _numberOfMovesNegative){
-      this.isValidCapture = _isValidCapture;
+function ValidMove(_canCapture, _numberOfMovesPositive, _numberOfMovesNegative){
+      this.canCapture = _canCapture;
       this.numberOfMovesPositive = _numberOfMovesPositive;
       this.numberOfMovesNegative = _numberOfMovesNegative;
 }
@@ -302,8 +302,11 @@ function movePieceToNewLocation(_originLocation, _destinationLocation){
 
 // ************************* Helper Function ******************************** //
 function opponentOccupied(_location, _opponentColor){
+  console.log("Entering opponentOccupied...");
   if(boardCells2D[_location.x][_location.y].piece != null){
+    console.log("Color of piece and opponentColor: " + boardCells2D[_location.x][_location.y].piece.color + " " + _opponentColor);
     if(boardCells2D[_location.x][_location.y].piece.color === _opponentColor){
+      console.log("It is an opponent cell. Oh noo. Fight it?");
       return true;
     }
     return false;
@@ -338,9 +341,15 @@ function removePieceAt(_location){
 
 
 // ************************* Helper Function ******************************** //
+function opponentColor(){
+  return (player1Turn ? "black" : "white");
+}
+
+// ************************* Helper Function ******************************** //
 function returnAllPossibleDestinationCell(_piece, _location){
   var originX = parseInt(_location.x);
   var originY = parseInt(_location.y);
+  // var colorOpponent = (player1Turn ? "black" : "white");
   var moveRule = _piece.moveRule;
   var returnArray = [];
   var playingDown = (_piece.color === "white");
@@ -354,8 +363,15 @@ function returnAllPossibleDestinationCell(_piece, _location){
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY;
     var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+      console.log("opponent occupied");
+      var condition2 = false; //Replace with capture rule
+    }
+    else {
+      var condition2 =  true;
+    }
 
-    if (condition1 ){
+    if (condition1 && condition2){
       returnArray.push(new Location(destinationX, destinationY));
     }
 
@@ -370,7 +386,16 @@ function returnAllPossibleDestinationCell(_piece, _location){
       destinationX = originX;
       destinationY = originY + validMove.numberOfMovesPositive;
     }
-    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+      console.log("opponent occupied");
+      var condition2 = false; //Replace with capture rule
+    }
+    else {
+      var condition2 =  true;
+    }
+
+    if (condition1 && condition2){
       returnArray.push(new Location(destinationX, destinationY));
     }
   }
@@ -382,23 +407,59 @@ function returnAllPossibleDestinationCell(_piece, _location){
     if(playingDown){
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
-    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+      console.log("opponent occupied");
+      var condition2 = false; //Replace with capture rule
+    }
+    else {
+      var condition2 =  true;
+    }
+
+    if (condition1 && condition2){
       returnArray.push(new Location(destinationX, destinationY));
     }
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
-    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+      console.log("opponent occupied");
+      var condition2 = false; //Replace with capture rule
+    }
+    else {
+      var condition2 =  true;
+    }
+
+    if (condition1 && condition2){
       returnArray.push(new Location(destinationX, destinationY));
     }
   } else {
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY + validMove.numberOfMovesPositive;
-    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+      console.log("opponent occupied");
+      var condition2 = false; //Replace with capture rule
+    }
+    else {
+      var condition2 =  true;
+    }
+
+    if (condition1 && condition2){
       returnArray.push(new Location(destinationX, destinationY));
     }
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY + validMove.numberOfMovesPositive;
-    if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+      console.log("opponent occupied");
+      var condition2 = false; //Replace with capture rule
+    }
+    else {
+      var condition2 =  true;
+    }
+
+    if (condition1 && condition2){
       returnArray.push(new Location(destinationX, destinationY));
     }
   }
@@ -415,19 +476,27 @@ function returnAllPossibleDestinationCell(_piece, _location){
       destinationX = originX + validMove.numberOfMovesPositive;
       destinationY = originY + validMove.numberOfMovesPositive;
   }
-  if (!ownPlayeroccupied(new Location(destinationX, destinationY))){
+  var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
+  if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
+    console.log("opponent occupied");
+    var condition2 = false; //Replace with capture rule
+  }
+  else {
+    var condition2 =  true;
+  }
+
+  if (condition1 && condition2){
     returnArray.push(new Location(destinationX, destinationY));
   }
   }
   return returnArray;
-
-
 }
 
 
 // ************************* Helper Function ******************************** //
 function ownPlayeroccupied(_location){
   var color =  (player1Turn ? "white" : "black");
+  // REPLACE ALL THESE CALLS WITH getPieceBasedOnLocation()
   if(boardCells2D[_location.x][_location.y].piece != null) {
     if(boardCells2D[_location.x][_location.y].piece.color === color){
       return true;
