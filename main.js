@@ -38,7 +38,8 @@ function Location(_x, _y){
 }
 
 // Object to represent a possible move and or capture for a piece
-function ValidMove(_canCapture, _numberOfMovesPositive, _numberOfMovesNegative){
+function ValidMove(_canMove, _canCapture, _numberOfMovesPositive, _numberOfMovesNegative){
+      this.canMove = _canMove;
       this.canCapture = _canCapture;
       this.numberOfMovesPositive = _numberOfMovesPositive;
       this.numberOfMovesNegative = _numberOfMovesNegative;
@@ -200,10 +201,10 @@ function makePiecesClickable(){
 function returnMovingCaptureRules(_pieceName){
   switch(_pieceName){
     case "pawn":
-    var pawnHorizontal = new ValidMove(false, 0, 0);
-    var pawnVertical = new ValidMove(false, 1, 0); // move forward but can't capture
-    var pawnDiagonal = new ValidMove(true, 1, 0); // forward capture diagonal only
-    var pawnHop = new ValidMove(false, 0, 0);
+    var pawnHorizontal = new ValidMove(false, false, 0, 0);
+    var pawnVertical = new ValidMove(true, false, 1, 0); // move forward but can't capture
+    var pawnDiagonal = new ValidMove(false, true, 1, 0); // forward capture diagonal only
+    var pawnHop = new ValidMove(false, false, 0, 0);
     return new MoveRule(pawnHorizontal, pawnVertical, pawnDiagonal, pawnHop);
     break;
     default:
@@ -362,19 +363,10 @@ function returnAllPossibleDestinationCell(_piece, _location){
   if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY;
-    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-      console.log("opponent occupied");
-      var condition2 = false; //Replace with capture rule
-    }
-    else {
-      var condition2 =  true;
-    }
-
-    if (condition1 && condition2){
+    console.log("horizontal");
+    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
-
   }
   // vertical
   validMove = moveRule.vertical;
@@ -386,16 +378,8 @@ function returnAllPossibleDestinationCell(_piece, _location){
       destinationX = originX;
       destinationY = originY + validMove.numberOfMovesPositive;
     }
-    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-      console.log("opponent occupied");
-      var condition2 = false; //Replace with capture rule
-    }
-    else {
-      var condition2 =  true;
-    }
-
-    if (condition1 && condition2){
+    console.log("vertical");
+    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
   }
@@ -407,59 +391,30 @@ function returnAllPossibleDestinationCell(_piece, _location){
     if(playingDown){
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
-    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-      console.log("opponent occupied");
-      var condition2 = false; //Replace with capture rule
-    }
-    else {
-      var condition2 =  true;
-    }
-
-    if (condition1 && condition2){
+    console.log("diagonal");
+    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
+
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY - validMove.numberOfMovesPositive;
-    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-      console.log("opponent occupied");
-      var condition2 = false; //Replace with capture rule
-    }
-    else {
-      var condition2 =  true;
-    }
-
-    if (condition1 && condition2){
+    console.log("diagonal");
+    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
+
   } else {
     destinationX = originX + validMove.numberOfMovesPositive;
     destinationY = originY + validMove.numberOfMovesPositive;
-    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-      console.log("opponent occupied");
-      var condition2 = false; //Replace with capture rule
-    }
-    else {
-      var condition2 =  true;
-    }
-
-    if (condition1 && condition2){
+    console.log("diagonal");
+    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
+
     destinationX = originX - validMove.numberOfMovesPositive;
     destinationY = originY + validMove.numberOfMovesPositive;
-    var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-    if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-      console.log("opponent occupied");
-      var condition2 = false; //Replace with capture rule
-    }
-    else {
-      var condition2 =  true;
-    }
-
-    if (condition1 && condition2){
+    console.log("diagonal");
+    if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
       returnArray.push(new Location(destinationX, destinationY));
     }
   }
@@ -468,7 +423,6 @@ function returnAllPossibleDestinationCell(_piece, _location){
   // hop NEEDS FIXING
   validMove = moveRule.hop;
   if (validMove.numberOfMovesPositive != 0 || validMove.numberOfMovesNegative != 0){
-
     if(playingDown){
       destinationX = originX - validMove.numberOfMovesPositive;
       destinationY = originY - validMove.numberOfMovesPositive;
@@ -476,20 +430,29 @@ function returnAllPossibleDestinationCell(_piece, _location){
       destinationX = originX + validMove.numberOfMovesPositive;
       destinationY = originY + validMove.numberOfMovesPositive;
   }
-  var condition1 = !ownPlayeroccupied(new Location(destinationX, destinationY));
-  if (opponentOccupied(new Location(destinationX, destinationY), opponentColor())){
-    console.log("opponent occupied");
-    var condition2 = false; //Replace with capture rule
-  }
-  else {
-    var condition2 =  true;
-  }
-
-  if (condition1 && condition2){
+  if (okToMoveTo(new Location(destinationX, destinationY), validMove)){
     returnArray.push(new Location(destinationX, destinationY));
   }
+
   }
   return returnArray;
+}
+
+
+// ************************* Helper Function ******************************** //
+// Checks if it is an acceptable cell to move into
+function okToMoveTo(_location, _validMove){
+  if(_location.x > 7 || _location.y > 7 || _location.x < 0 || _location.y < 0){
+    return false;
+  }
+  if (ownPlayeroccupied(_location)){
+    return false;
+  }
+  if(opponentOccupied(_location, opponentColor())){
+    return _validMove.canCapture;
+  }
+  return _validMove.canMove;
+
 }
 
 
