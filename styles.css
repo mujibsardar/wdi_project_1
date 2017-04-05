@@ -8,9 +8,26 @@ img {
   height: 50px;
 }
 
+div {
+  /*display: inline-block;*/
+}
+
 #container {
     background-color: green;
-    margin-left: : 40px;
-    margin-top: 20px;
+    /*margin-left: : 40px;
+    margin-top: 20px;*/
     border-style: solid;
+}
+
+
+#player1_box {
+    width: 100px;
+    height: 550px;
+    background-color: brown;
+}
+
+#player2_box {
+    width: 100px;
+    height: 550px;
+    background-color: green;
 }

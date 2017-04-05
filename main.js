@@ -12,19 +12,22 @@ var boardCells2D = [['','','','','','','',''],['','','','','','','',''],['','','
 var showingDestinationCells = false;
 var piecesOrder = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"];
 var pieceValue = {pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 100}
+var pieceValueArray = [5,3,3,9,22,3,3,5];
 
 // ************************* Objects ******************************** //
-function Piece(_name, _color, _player, _moveRule, _imgText){
+function Piece(_name, _color, _player, _moveRule, _imgText, _value){
   this.name = _name;
   this.color = _color;
   this.player = _player;
   this.moveRule = _moveRule;
   this.imgText = _imgText;
+  this.value = _value;
   //this.value = pieceValue._name;
 }
 
 function Player(_name){
   this.name = _name;
+  this.score = 0;
 }
 
 function MoveRule(_horizontal, _vertical, _diagonal, _hop){
@@ -66,8 +69,11 @@ function setupBoard(){
   flip = true;
 
   var $board = $("#container");
+  var $scoreBox = $(".scoreBox");
+
   $board.css("width", boardSize * 10 * 8 + 64 + "px");
   $board.css("height", boardSize * 10 * 8 + 64 + "px");
+  //$scoreBox.css("height", boardSize * 10 * 8 + 64 + "px");
 
   for(i = 0; i < 64; i++){
     var $elem = jQuery('<div/>', { 'class': "cell" });
@@ -121,14 +127,14 @@ function setupPieces(){
     var pieceColor = "black"
     var location = new Location(i,1);
     var imageText = createImageText(pieceName, pieceColor);
-    var piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText);
+    var piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText, 1);
     placePieceInCell(location, piece);
 
     pieceName = "pawn";
     pieceColor = "white"
     location = new Location(i,6);
     imageText = createImageText(pieceName, pieceColor);
-    piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText);
+    piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText, 1);
     placePieceInCell(location, piece);
     }
 
@@ -137,7 +143,7 @@ function setupPieces(){
       pieceColor = "black"
       location = new Location(i,0);
       imageText = createImageText(pieceName, pieceColor);
-      piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText);
+      piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText, pieceValueArray[i]);
       placePieceInCell(location, piece);
     }
 
@@ -146,7 +152,7 @@ function setupPieces(){
       pieceColor = "white"
       location = new Location(i,7);
       imageText = createImageText(pieceName, pieceColor);
-      piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText);
+      piece = new Piece(pieceName, pieceColor, player_2, returnMovingCaptureRules(pieceName), imageText,pieceValueArray[i]);
       placePieceInCell(location, piece);
     }
 }
@@ -376,8 +382,27 @@ function opponentOccupied(_location, _opponentColor){
 
 // ************************* Helper Function ******************************** //
 function capture(_location){
+  updateScore(_location);
   capturePieceAt(_location);
   removePieceAt(_location);
+}
+
+
+// ************************* Helper Function ******************************** //
+function updateScore(_location){
+    var piece = getPieceBasedOnLocation(_location);
+    var $player1Score = $(".player_1_score");
+    var $player2Score = $(".player_2_score");
+
+    console.log(JSON.stringify(piece));
+    if (player1Turn) {
+      player_1.score = player_1.score + piece.value;
+      $player1Score.text(player_1.score);
+}
+else {
+      player_2.score = player_2.score + piece.value;
+      $player2Score.text(player_2.score);
+}
 }
 
 
@@ -400,7 +425,6 @@ function removePieceAt(_location){
   boardCells2D[_location.x][_location.y].piece = null;
   boardCells2D[_location.x][_location.y].divRef.children("img:first").remove();
 }
-
 
 
 // ************************* Helper Function ******************************** //
@@ -768,4 +792,49 @@ function getPieceBasedOnLocation(_location){
   var x = _location.x;
   var y = _location.y;
   return boardCells2D[x][y].piece;
+}
+
+// http://snipplr.com/view/51412/javascript-count-down-timer-in-minutes-and-seconds/
+
+  var min = 1;
+  //var sec = 60;
+  var totalSeconds = min * 60;
+
+
+  // var minutes;
+  // var seconds;
+  $timerElement = $(".timer");
+
+  var timerVar = setInterval(counter, 1000);
+
+  function counter(){
+    --totalSeconds;
+    if(totalSeconds == 0){
+      //end timer
+      clearInterval(timerVar);
+      var winner = (player_1.score > player_2.score) ? player_1.name : player_2.name;
+      alert(winner + " Won!");
+    }
+    // if just seconds left
+      if((totalSeconds / 60) < 1){
+        $timerElement.text(getSecs());
+      }
+      else {
+        $timerElement.text(getMins() + " : " + getSecs());
+      }
+  }
+
+  function getMins(){
+    return Math.floor(totalSeconds / 60);
+    // return Math.floor(sec / 60);
+  }
+
+  function getSecs(){
+    if(totalSeconds > 59){
+      var tmp = Math.floor(totalSeconds / 60);
+      return totalSeconds - (tmp * 60);
+    }
+    else {
+      return totalSeconds;
+  }
 }
