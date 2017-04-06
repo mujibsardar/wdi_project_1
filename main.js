@@ -5,14 +5,18 @@ var horizontalLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 var verticalCounter = 7;
 var horizontalCounter = 0;
 var player1Turn = true;
-var player_1 = new Player("Avan");
-var player_2 = new Player("Android");
+var player_1 = new Player("Avan", 0);
+var player_2 = new Player("Android", 0);
 var capturedPieces = {player_1: [], player_2: []};
 var boardCells2D = [['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','','']];
 var showingDestinationCells = false;
 var piecesOrder = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"];
 var pieceValue = {pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 100}
 var pieceValueArray = [5,3,3,9,22,3,3,5];
+var min = 10;
+var totalSeconds = min * 60;
+var $timerElement = $(".timer");
+var timerVar;
 
 // ************************* Objects ******************************** //
 function Piece(_name, _color, _player, _moveRule, _imgText, _value){
@@ -25,9 +29,9 @@ function Piece(_name, _color, _player, _moveRule, _imgText, _value){
   //this.value = pieceValue._name;
 }
 
-function Player(_name){
+function Player(_name, _score){
   this.name = _name;
-  this.score = 0;
+  this.score = _score;
 }
 
 function MoveRule(_horizontal, _vertical, _diagonal, _hop){
@@ -56,11 +60,42 @@ function ValidMove(_canMove, _canCapture, _numberOfMovesPositive, _numberOfMoves
 startGame();
 
 
+
+
 // ************************* 1st ******************************** //
 function startGame(){
+    promptForNames();
+    startTimer();
     setupBoard();
     setupPieces();
     makePiecesClickable();
+    displayScore();
+    //activateResetButton();
+}
+
+function promptForNames(){
+  player_1.name = prompt("Please enter name of the first player");
+  player_2.name = prompt("Please enter name of the second player");
+}
+
+function resetVariables(){
+  var boardSize = 6;
+  var horizontalLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  var verticalCounter = 7;
+  var horizontalCounter = 0;
+  var player1Turn = true;
+  var player_1 = new Player("Avan", 0);
+  var player_2 = new Player("Android", 0);
+  var capturedPieces = {player_1: [], player_2: []};
+  var boardCells2D = [['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','','']];
+  var showingDestinationCells = false;
+  var piecesOrder = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"];
+  var pieceValue = {pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 100}
+  var pieceValueArray = [5,3,3,9,22,3,3,5];
+  var min = 10;
+  var totalSeconds = min * 60;
+  var $timerElement = $(".timer");
+  var timerVar;
 }
 
 
@@ -70,6 +105,11 @@ function setupBoard(){
 
   var $board = $("#container");
   var $scoreBox = $(".scoreBox");
+  var $playerOneName = $(".player_1_name");
+  var $playerTwoName = $(".player_2_name");
+
+  $playerOneName.text(player_1.name);
+  $playerTwoName.text(player_2.name);
 
   $board.css("width", boardSize * 10 * 8 + 64 + "px");
   $board.css("height", boardSize * 10 * 8 + 64 + "px");
@@ -287,6 +327,8 @@ function placePieceInCell(_location, _piece){
   var y = _location.y;
   boardCells2D[x][y].piece = _piece;
   boardCells2D[x][y].divRef.append(_piece.imgText);
+  var audio = new Audio('chess_move.wav');
+  audio.play();
 }
 
 
@@ -394,7 +436,6 @@ function updateScore(_location){
     var $player1Score = $(".player_1_score");
     var $player2Score = $(".player_2_score");
 
-    console.log(JSON.stringify(piece));
     if (player1Turn) {
       player_1.score = player_1.score + piece.value;
       $player1Score.text(player_1.score);
@@ -407,15 +448,26 @@ else {
 
 
 // ************************* Helper Function ******************************** //
+function displayScore(){
+  var $player1Score = $(".player_1_score");
+  var $player2Score = $(".player_2_score");
+  $player1Score.text(player_1.score);
+  $player2Score.text(player_2.score);
+}
+
+
+// ************************* Helper Function ******************************** //
 function capturePieceAt(_location){
   var piece = boardCells2D[_location.x][_location.y].piece;
   if(player1Turn){
     capturedPieces.player_1.push(piece);
-    $(".player_1_capture").append(piece.imgText);
+    // $(piece.imgText).appendTo($(".player_1_capture"));
+     $(".player_1_capture").append(piece.imgText);
   }
   else {
     capturedPieces.player_2.push(piece);
-    $(".player_2_capture").append(piece.imgText);
+    // $(piece.imgText).appendTo($(".player_2_capture"));
+     $(".player_2_capture").append(piece.imgText);
   }
 }
 
@@ -745,9 +797,6 @@ function returnAllPossibleDestinationCell(_piece, _location){
       }
 
   }
-
-
-
   return returnArray;
 }
 
@@ -796,25 +845,31 @@ function getPieceBasedOnLocation(_location){
 
 // http://snipplr.com/view/51412/javascript-count-down-timer-in-minutes-and-seconds/
 
-  var min = 1;
-  //var sec = 60;
-  var totalSeconds = min * 60;
 
+  function startTimer(){
+    timerVar = setInterval(counter, 1000);
+  }
 
-  // var minutes;
-  // var seconds;
-  $timerElement = $(".timer");
-
-  var timerVar = setInterval(counter, 1000);
+  function stopTimer(){
+    //  alert("stopTimer Called");
+    clearInterval(timerVar);
+  }
 
   function counter(){
     --totalSeconds;
     if(totalSeconds == 0){
       //end timer
-      clearInterval(timerVar);
-      var winner = (player_1.score > player_2.score) ? player_1.name : player_2.name;
-      alert(winner + " Won!");
+      if(player_1.score != player_2.score){
+        var winner = (player_1.score > player_2.score) ? player_1.name : player_2.name;
+        alert(winner + " Won!");
+        //reset();
+      }
+      else {
+        alert("It's a draw!");
+      }
+      stopGame();
     }
+
     // if just seconds left
       if((totalSeconds / 60) < 1){
         $timerElement.text(getSecs());
@@ -837,4 +892,33 @@ function getPieceBasedOnLocation(_location){
     else {
       return totalSeconds;
   }
+}
+
+function activateResetButton(){
+  $resetButton = $(".reset");
+  $resetButton.on("click", function(){
+    // alert("resetButton pressed");
+    // stopGame();
+    resetGame();
+    //startGame();
+  })
+}
+
+function stopGame(){
+  // alert("Time stopped");
+  removeAllClickEventListeners();
+  stopTimer();
+}
+
+
+function resetGame(){
+  // alert("resetGame entered");
+  resetVariables();
+  promptForNames();
+  stopTimer();
+  startTimer();
+  setupBoard();
+  setupPieces();
+  makePiecesClickable();
+  displayScore();
 }

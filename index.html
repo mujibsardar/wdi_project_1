@@ -3,21 +3,41 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="styles.css">
+    <style media="screen">
+
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js" charset="utf-8"></script>
-    <title>Chess 1.0</title>
+    <title>Monarch Free Chess</title>
   </head>
   <body>
-    <div class="player_1_capture"></div>
+    <div class="mother_container">
 
-    <!-- <div id="player1_box" class="score_box"><div> -->
+    <h3>Time Left: </h3></span><div class="timer"></div>
+
+    <div id="player1_box" class="score_box">
+      <h2  class="player_1_name"></h2>
+      <div class="player_1_capture"></div>
+      <h4>Score</h4>
+      <p class="player_1_score"></p>
+    </div>
+
     <div id="container"></div>
-    <!-- <div id="player2_box" class="score_box"></div> -->
 
+    <div id="player2_box" class="score_box">
+      <h2  class="player_2_name"></h2>
+      <div class="player_2_capture"></div>
+      <h4>Score</h4>
+      <p class="player_2_score"></p>
+    </div>
 
-    <div class="player_2_capture"></div>
-    <p>Player 1 Score: </p><div class="player_1_score">Player 1 Score Here</div>
-    <p>Player 2 Score: </p><div class="player_2_score">Player 2 Score Here</div>
-    <div class="timer">Timer Here</div>
+    <div class="bottom_quote">Because there is always a way out...</div>
+
+    </div>
+</div>
+
+    <!-- <p>Player 1 Score: </p><div class="player_1_score"></div> -->
+    <!-- <p>Player 2 Score: </p><div class="player_2_score"></div> -->
+    <!-- <br /><button type="button" name="button" class="reset">Reset</button> -->
     <script src="main.js"></script>
   </body>
 </html>
