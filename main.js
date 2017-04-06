@@ -17,6 +17,9 @@ var min = 10;
 var totalSeconds = min * 60;
 var $timerElement = $(".timer");
 var timerVar;
+var player1QueenCaptured = false;
+var player2QueenCaptured = false;
+var kingAlternativeScore = 8;
 
 // ************************* Objects ******************************** //
 function Piece(_name, _color, _player, _moveRule, _imgText, _value){
@@ -78,25 +81,26 @@ function promptForNames(){
   player_2.name = prompt("Please enter name of the second player");
 }
 
-function resetVariables(){
-  var boardSize = 6;
-  var horizontalLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-  var verticalCounter = 7;
-  var horizontalCounter = 0;
-  var player1Turn = true;
-  var player_1 = new Player("Avan", 0);
-  var player_2 = new Player("Android", 0);
-  var capturedPieces = {player_1: [], player_2: []};
-  var boardCells2D = [['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','','']];
-  var showingDestinationCells = false;
-  var piecesOrder = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"];
-  var pieceValue = {pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 100}
-  var pieceValueArray = [5,3,3,9,22,3,3,5];
-  var min = 10;
-  var totalSeconds = min * 60;
-  var $timerElement = $(".timer");
-  var timerVar;
-}
+
+// function resetVariables(){
+//   var boardSize = 6;
+//   var horizontalLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+//   var verticalCounter = 7;
+//   var horizontalCounter = 0;
+//   var player1Turn = true;
+//   var player_1 = new Player("Avan", 0);
+//   var player_2 = new Player("Android", 0);
+//   var capturedPieces = {player_1: [], player_2: []};
+//   var boardCells2D = [['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','','']];
+//   var showingDestinationCells = false;
+//   var piecesOrder = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"];
+//   var pieceValue = {pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 100}
+//   var pieceValueArray = [5,3,3,9,22,3,3,5];
+//   var min = 10;
+//   var totalSeconds = min * 60;
+//   var $timerElement = $(".timer");
+//   var timerVar;
+// }
 
 
 // ************************* 2nd ******************************** //
@@ -424,8 +428,8 @@ function opponentOccupied(_location, _opponentColor){
 
 // ************************* Helper Function ******************************** //
 function capture(_location){
-  updateScore(_location);
   capturePieceAt(_location);
+  updateScore(_location);
   removePieceAt(_location);
 }
 
@@ -435,15 +439,37 @@ function updateScore(_location){
     var piece = getPieceBasedOnLocation(_location);
     var $player1Score = $(".player_1_score");
     var $player2Score = $(".player_2_score");
+    var kingPiece = false;
+    //
+    kingPiece = (piece.name == "king");
 
+    console.log("King and Queen1CapturedYet Queen2CapturedYet: "  + kingPiece + " "  + player1QueenCaptured + " " + player2QueenCaptured);
     if (player1Turn) {
-      player_1.score = player_1.score + piece.value;
+      // If queen is NOT captured before king then king becomes less valuable
+      // Strategy: Do you capture the quuen or wait for the king?
+      // King is worth more but queen is more powerful.
+      // Queen value before king has been captured is 22
+      // Queen value after king has been captured is 9
+      // Queen + King => Make
+      //
+      if(kingPiece && player2QueenCaptured){
+          player_1.score = player_1.score + kingAlternativeScore;
+      }
+      else {
+        player_1.score = player_1.score + piece.value;
+      }
       $player1Score.text(player_1.score);
 }
 else {
+
+    if(kingPiece && player2QueenCaptured){
+      player_2.score = player_2.score + kingAlternativeScore;
+    }
+    else {
       player_2.score = player_2.score + piece.value;
+    }
       $player2Score.text(player_2.score);
-}
+    }
 }
 
 
@@ -460,11 +486,17 @@ function displayScore(){
 function capturePieceAt(_location){
   var piece = boardCells2D[_location.x][_location.y].piece;
   if(player1Turn){
+    if(piece.name == "queen"){
+        player2QueenCaptured = true;
+    }
     capturedPieces.player_1.push(piece);
     // $(piece.imgText).appendTo($(".player_1_capture"));
      $(".player_1_capture").append(piece.imgText);
   }
   else {
+    if(piece.name == "queen"){
+        player1QueenCaptured = true;
+    }
     capturedPieces.player_2.push(piece);
     // $(piece.imgText).appendTo($(".player_2_capture"));
      $(".player_2_capture").append(piece.imgText);
@@ -887,12 +919,17 @@ function getPieceBasedOnLocation(_location){
   function getSecs(){
     if(totalSeconds > 59){
       var tmp = Math.floor(totalSeconds / 60);
-      return totalSeconds - (tmp * 60);
+      var returnVar = totalSeconds - (tmp * 60);
+      if(returnVar < 10){
+        return ("0" + returnVar);
+      }
+      return returnVar;
     }
     else {
       return totalSeconds;
+    }
   }
-}
+
 
 function activateResetButton(){
   $resetButton = $(".reset");
