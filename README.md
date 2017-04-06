@@ -1,4 +1,4 @@
-# Monarch Free Chess
+# Lame King Chess
 
 
 ## Overview
