@@ -20,6 +20,7 @@ var timerVar;
 var player1QueenCaptured = false;
 var player2QueenCaptured = false;
 var kingAlternativeScore = 8;
+var quotesArray = [];
 
 // ************************* Objects ******************************** //
 function Piece(_name, _color, _player, _moveRule, _imgText, _value){
@@ -67,13 +68,71 @@ startGame();
 
 // ************************* 1st ******************************** //
 function startGame(){
+    loadQuotes();
     promptForNames();
     startTimer();
     setupBoard();
     setupPieces();
     makePiecesClickable();
     displayScore();
+    startShowingQuotes();
     //activateResetButton();
+}
+
+function startShowingQuotes(){
+ var rangeOfQuotes = quotesArray.length;
+  var intervalQuotes = setInterval(showQuotes,7000)
+  var random = Math.floor(Math.random() * rangeOfQuotes)
+  $(".bottom_quote").text(quotesArray[random]);
+}
+
+function showQuotes(){
+  var rangeOfQuotes = quotesArray.length;
+  var random = Math.floor(Math.random() * rangeOfQuotes);
+  $(".bottom_quote").fadeOut(1000, loadNextQuote);
+}
+
+function loadNextQuote(){
+  console.log("loadNextQuote")
+  var rangeOfQuotes = quotesArray.length;
+  var random = Math.floor(Math.random() * rangeOfQuotes);
+  $(".bottom_quote").text(quotesArray[random]);
+  $(".bottom_quote").fadeIn(1000);
+}
+
+
+
+function loadQuotes(){
+  quotesArray.push("Because there is always a way out...");
+  quotesArray.push("Behind every man is a great woman. -Proverb");
+  quotesArray.push("Appear weak when you are strong, and strong when you are weak. -Sun Tzu");
+  quotesArray.push("The supreme art of war is to subdue the enemy without fighting. -Sun Tzu");
+  quotesArray.push("Let your plans be dark and impenetrable as night, and when you move, fall like a thunderbolt. -Sun Tzu");
+  quotesArray.push("Victorious warriors win first and then go to war, while defeated warriors go to war first and then seek to win -Sun Tzu");
+  quotesArray.push("In the midst of chaos, there is also opportunity -Sun Tzu");
+  quotesArray.push("Treat your men as you would your own beloved sons. And they will follow you into the deepest valley. -Sun Tzu");
+  quotesArray.push("When you surround an army, leave an outlet free. Do not press a desperate foe too hard. -Sun Tzu");
+  quotesArray.push("One may know how to conquer without being able to do it. -Sun Tzu");
+  quotesArray.push("He who is prudent and lies in wait for an enemy who is not, will be victorious. -Sun Tzu");
+  quotesArray.push(" If you know the enemy and know yourself, your victory will not stand in doubt; if you know Heaven and know Earth, you may make your victory complete.-Sun Tzu");
+  quotesArray.push(" Thus the expert in battle moves the enemy, and is not moved by him. -Sun Tzu");
+  quotesArray.push("Hold out baits to entice the enemy. Feign disorder, and crush him -Sun Tzu");
+  quotesArray.push("All men can see the tactics whereby I conquer, but what none can see is the strategy out of which victory is evolved. -Sun Tzu");
+  quotesArray.push("and addressed them thus: “I presume you know the difference between front and back, right hand and left hand? -Sun Tzu");
+  quotesArray.push("He who relies solely on warlike measures shall be exterminated; he who relies solely on peaceful measures shall perish. -Sun Tzu");
+  quotesArray.push("There are not more than five primary colours, yet in combination they produce more hues than can ever been seen. -Sun Tzu");
+  quotesArray.push("These are: (1) the Moral Law; (2) Heaven; (3) Earth; (4) the Commander; (5) method and discipline. -Sun Tzu");
+  quotesArray.push("Pretend to be weak, that he may grow arrogant. -Sun Tzu");
+  quotesArray.push("Appear at points which the enemy must hasten to defend; march swiftly to places where you are not expected -Sun Tzu");
+  quotesArray.push("You must be swift as the wind, dense as the forest, rapacious as fire, steadfast like a mountain, mysterious as night and mighty as thunder. -Sun Tzu");
+  quotesArray.push("We may stumble and fall but shall rise again; it should be enough if we did not run away from the battle. - Gandhi");
+  quotesArray.push("All battles and wars are won in the mind first - Anonymous");
+  quotesArray.push("The best fighter is never angry. - Lao Tzu");
+  quotesArray.push("A man with outward courage dares to die; a man with inner courage dares to live. Lao Tzu");
+  quotesArray.push("If you do not change direction, you may end up where you are heading - Lao Tzu");
+  quotesArray.push("There is no greater danger than underestimating your opponent. -Lao Tzu");
+  quotesArray.push("Your enemy is not the one with the knive but the one with a smile -Anonymous");
+  quotesArray.push("There is and will be no greater battle than what you struggle with on the inside -Anonymous");
 }
 
 function promptForNames(){
