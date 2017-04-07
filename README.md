@@ -12,9 +12,6 @@ This is a simplified version of a two player chess game. Unlike conventional che
 * Cannot use any of the pawn passing rules (En passant)
 
 The objective is to capture as many high value pieces from the opponent within a pre-defined period. Whoever ends up with the most pieces
-<<<<<<< HEAD
-worth more than the opponents total captured pieces value wins.
-=======
 worth more than the opponents total captured pieces value wins.
 
 
