@@ -34,7 +34,7 @@ Bishop = 3
 Knight = 3  	
 Pawn = 1
 
-However if Queen has been captured before the king of the same color the value drops to 8.
+However if Queen has been captured before the king of the same color the value of the king drops to 8.
 
 ### Movement and capture Rules
 
