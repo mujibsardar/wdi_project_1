@@ -32,6 +32,8 @@ Bishop = 3
 Knight = 3  	
 Pawn = 1
 
+However if Queen has been captured before the king of the same color the value drops to 8. 
+
 ### Movement and capture Rules
 
 King = The king can move and capture one cell in any direction.  	

@@ -63,9 +63,6 @@ function ValidMove(_canMove, _canCapture, _numberOfMovesPositive, _numberOfMoves
 // ************************* BEGIN ******************************** //
 startGame();
 
-
-
-
 // ************************* 1st ******************************** //
 function startGame(){
     loadQuotes();
