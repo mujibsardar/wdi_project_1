@@ -45,14 +45,3 @@ Bishop = The bishop can move and capture infinite cells diagonally only
 Knight = The knight is the only one the can hop cells. The knight can move and capture into cells that are two cells in the
 horizontal and then one cell in the vertical and vice versa. It cannot move or capture into any of the between cells.  	
 Pawn = The pawn can move one cell in the vertical direction but can only capture one cell in the forward diagonal direction.
-
-
-### Movement and capture Rules
-
-King = The king can move and capture one cell in any direction.  	
-Queen = The queen can move and capture infinite cells in any direction.
-Rook = The rook can move and capture infinite cells in horizontal and vertical direction 	
-Bishop = The bishop can move and capture infinite cells diagonally only  	
-Knight = The knight is the only one the can hop cells. The knight can move and capture into cells that are two cells in the
-horizontal and then one cell in the vertical and vice versa. It cannot move or capture into any of the between cells.  	
-Pawn = The pawn can move one cell in the vertical direction but can only capture one cell in the forward diagonal direction.
