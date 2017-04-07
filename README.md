@@ -1,8 +1,10 @@
-# Monarch Free Chess
+# Lame King Chess
 
 
 ## Overview
 
+This is a simplified version of a two player chess game. Unlike conventional chess, players
+* Cannot put the opponents king in check.
 This is a simplified version of a two player chess game. Unlike conventional chess, players
 * Cannot put the opponents king in check.
 * Can only move chess pieces according to set rules with no exceptions (e.g. pawns can only move forward one cell regardless of where they are).
@@ -10,6 +12,9 @@ This is a simplified version of a two player chess game. Unlike conventional che
 * Cannot use any of the pawn passing rules (En passant)
 
 The objective is to capture as many high value pieces from the opponent within a pre-defined period. Whoever ends up with the most pieces
+<<<<<<< HEAD
+worth more than the opponents total captured pieces value wins.
+=======
 worth more than the opponents total captured pieces value wins.
 
 
@@ -32,7 +37,18 @@ Bishop = 3
 Knight = 3  	
 Pawn = 1
 
-However if Queen has been captured before the king of the same color the value drops to 8. 
+However if Queen has been captured before the king of the same color the value drops to 8.
+
+### Movement and capture Rules
+
+King = The king can move and capture one cell in any direction.  	
+Queen = The queen can move and capture infinite cells in any direction.
+Rook = The rook can move and capture infinite cells in horizontal and vertical direction 	
+Bishop = The bishop can move and capture infinite cells diagonally only  	
+Knight = The knight is the only one the can hop cells. The knight can move and capture into cells that are two cells in the
+horizontal and then one cell in the vertical and vice versa. It cannot move or capture into any of the between cells.  	
+Pawn = The pawn can move one cell in the vertical direction but can only capture one cell in the forward diagonal direction.
+
 
 ### Movement and capture Rules
 
