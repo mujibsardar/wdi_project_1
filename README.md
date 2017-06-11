@@ -5,11 +5,10 @@
 
 This is a simplified version of a two player chess game. Unlike conventional chess, players
 * Cannot put the opponents king in check.
-This is a simplified version of a two player chess game. Unlike conventional chess, players
 * Cannot put the opponents king in check.
 * Can only move chess pieces according to set rules with no exceptions (e.g. pawns can only move forward one cell regardless of where they are).
 * Cannot castle
-* Cannot use any of the pawn passing rules (En passant)
+* Cannot use any of the pawn passing rules (en passant)
 
 The objective is to capture as many high value pieces from the opponent within a pre-defined period. Whoever ends up with the most pieces
 worth more than the opponents total captured pieces value wins.
